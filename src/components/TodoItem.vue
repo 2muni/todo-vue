@@ -1,6 +1,7 @@
 <template>
   <div class="todo-item">
     <div class="todo-item-left">
+      <input type="checkbox" v-model="completed" @change="doneEdit">
       <div v-if="!editing" class="todo-item-label" @dblclick="editTodo" :class="{completed: completed}">{{ title }}</div>
       <input v-else class="todo-item-edit" type="text" v-model="title" @blur="doneEdit" @keyup.enter="doneEdit" @keyup.esc="cancelEdit" v-focus>
     </div>
@@ -16,6 +17,10 @@ export default {
       type: Object,
       required: true,
     },
+    checkAll: {
+      type: Boolean,
+      required: true,
+    }
   },
   data() {
     return {
@@ -24,6 +29,11 @@ export default {
       completed: this.todo.completed,
       editing: this.todo.editing,
       beforeEditCache: '',
+    }
+  },
+  watch: {
+    checkAll() {
+      this.completed = this.checkAll ? true : this.todo.completed
     }
   },
   directives: {
@@ -46,7 +56,7 @@ export default {
         this.title = this.beforeEditCache
       }
       this.editing = false
-      this.$emit('finishedEdit', {
+      this.$emit('doneEdit', {
         'id': this.id,
         'title': this.title,
         'completed': this.completed,
@@ -62,12 +72,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 .todo-item {
   margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  animation-duration: 0.3s;
 }
 .remove-item {
   cursor: pointer;
@@ -97,5 +107,8 @@ export default {
     outline: none;
   }
 }
+.completed {
+  text-decoration: line-through;
+  color: grey;
+}
 </style>
-
